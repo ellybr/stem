@@ -234,8 +234,16 @@
                                 <option value="Conceptual Understanding">Conceptual Understanding</option>
                                 <option value="Procedural Fluency">Procedural Fluency</option>
                                 <option value="Application">Application</option>
-                                <option value="Reasoning & Proof">Reasoning & Proof</option>
-                                <option value="Modeling">Modeling</option>
+                                <option value="Modeling & Simulation">Modeling & Simulation</option>
+                                <option value="Scientific Practices">Scientific Practices</option>
+                                <option value="Engineering Design">Engineering Design</option>
+                                <option value="Data Analysis">Data Analysis</option>
+                                <option value="Systems Thinking">Systems Thinking</option>
+                                <option value="Computational Thinking">Computational Thinking</option>
+                                <option value="Evidence & Argumentation">Evidence & Argumentation</option>
+                                <option value="Measurement & Precision">Measurement & Precision</option>
+                                <option value="Problem Decomposition">Problem Decomposition</option>
+                                <option value="Coding & Algorithms">Coding & Algorithms</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
@@ -960,46 +968,46 @@
                         { id: 'vst-representations', label: 'Use representations', description: 'Students explain thinking using models or diagrams.' }
                     ],
                     low: {
-                        why: 'Reasoning is not visible in artifacts, so it is hard to monitor progress.',
+                        why: 'Reasoning is not captured in artifacts, so progress monitoring lacks evidence.',
                         moves: [
-                            `Launch ${focusArea} with a notebook routine: prompt students to restate the task and label their plan.`,
-                            'Collect two work samples per table and tag where reasoning is missing.',
-                            'Use a 60-second turn-and-explain to capture student language.'
+                            `Co-construct success criteria for ${focusArea} and model an annotated example.`,
+                            'Capture at least two work samples per group, including one developing example.',
+                            'Use multilingual or visual talk moves so every student can explain thinking.'
                         ],
                         lookFors: [
                             'Annotated steps in notebooks with labels or arrows.',
                             'Exit tickets that include “why” or “how” statements.',
-                            'Talk moves recorded in a monitoring chart.'
+                            'Monitoring notes reflect multiple student voices.'
                         ],
-                        script: `“Show me your thinking for ${focusArea}. Write the plan before you solve, then explain it to a partner.”`,
-                        microGoal: `By the end of the lesson, 80% of students in grade ${grade} show annotated reasoning in their work.`
+                        script: `“Let’s name the success criteria for ${focusArea}. Show your plan and explain it with words, diagrams, or gestures.”`,
+                        microGoal: `By the end of class, evidence from each group includes at least one annotated reasoning sample.`
                     },
                     mid: {
                         why: 'Reasoning appears in some artifacts but is inconsistent across students.',
                         moves: [
-                            'Use a checklist for notebook evidence during monitoring.',
-                            'Ask students to add one representation to their solution.',
-                            'Collect exit tickets that require a justification sentence.'
+                            'Use a monitoring checklist that tracks who has evidence captured.',
+                            'Ask students to add one representation and a justification sentence.',
+                            'Collect exit tickets with a sentence frame for explanation.'
                         ],
                         lookFors: [
                             'Consistent annotations on most student work.',
                             'Representations (models/graphs) labeled in notebooks.',
-                            'Monitoring notes that cite student explanations.'
+                            'Monitoring notes that cite multiple students.'
                         ],
-                        script: `“Add a representation for ${focusArea} and explain why it proves your answer.”`,
-                        microGoal: `During monitoring, collect evidence from 3 students per group that shows reasoning plus a representation.`
+                        script: `“Add a representation for ${focusArea} and use the sentence frame to justify your answer.”`,
+                        microGoal: `Collect reasoning evidence from every group, including at least two different students per group.`
                     },
                     high: {
                         why: 'Reasoning is visible; focus on transfer and refinement across tasks.',
                         moves: [
                             'Have students compare two strategies and annotate tradeoffs.',
-                            'Use peer feedback to revise reasoning statements.',
-                            'Capture exemplar work for future reference.'
+                            'Use peer feedback protocols so every student revises at least one explanation.',
+                            'Capture diverse exemplars that show different approaches.'
                         ],
                         lookFors: [
                             'Students reference multiple strategies in their notes.',
                             'Revisions based on peer feedback are visible.',
-                            'Exemplar work is labeled and archived.'
+                            'Exemplars include varied approaches.'
                         ],
                         script: `“Compare two ways to solve ${focusArea}. Annotate which is more efficient and why.”`,
                         microGoal: `Students independently justify strategy choices and revise their work with evidence.`
@@ -1016,14 +1024,14 @@
                     low: {
                         why: 'Students are not consistently identifying the task or applying a clear strategy.',
                         moves: [
-                            `Use a “What is the question?” routine before ${focusArea}.`,
-                            'Require students to name the strategy in writing before solving.',
-                            'Model a think-aloud with a check step at the end.'
+                            `Use a “What is the question?” routine before ${focusArea} with visual supports.`,
+                            'Require students to name the strategy in writing or orally before solving.',
+                            'Model a think-aloud that includes a check step and error correction.'
                         ],
                         lookFors: [
                             'Problem restated at the top of the page.',
                             'Strategy name written before calculations.',
-                            'Visible check step (estimate or verification).'
+                            'Check step recorded (estimate, inverse, or verification).'
                         ],
                         script: `“Before you solve ${focusArea}, write the question in your own words and name the strategy.”`,
                         microGoal: `In grade ${grade}, 4/5 students write a strategy name before solving.`
@@ -1033,12 +1041,12 @@
                         moves: [
                             'Add a strategy justification sentence to solutions.',
                             'Use a checklist: restate, choose strategy, solve, check.',
-                            'Prompt a quick reflection: “What did you learn?”'
+                            'Prompt a quick reflection: “What did you learn and what will you try next?”'
                         ],
                         lookFors: [
                             'Strategy justification appears in student work.',
                             'Checklist boxes are completed.',
-                            'Reflection responses are written or spoken.'
+                            'Reflection responses are written, spoken, or recorded.'
                         ],
                         script: `“Explain why your strategy fits ${focusArea}, then check and revise.”`,
                         microGoal: `Students complete all four steps (restate, strategy, solve, check) on today’s task.`
@@ -1071,13 +1079,13 @@
                         why: 'Students cannot connect their data to a clear goal or plan.',
                         moves: [
                             'Establish a data tracker and record current scores.',
-                            'Write a single measurable goal tied to ${focusArea}.',
-                            'Create a simple action plan with two steps.'
+                            `Write a single measurable goal tied to ${focusArea} with student language.`,
+                            'Create a simple action plan with two steps and one check-in date.'
                         ],
                         lookFors: [
                             'Data tracker with a current score.',
                             'Goal statement visible in notebooks.',
-                            'Action steps written and referenced.'
+                            'Action steps written with a check-in date.'
                         ],
                         script: `“What is your current score and your next goal for ${focusArea}? Write the plan.”`,
                         microGoal: `Every student records a current score and one action step by end of class.`
