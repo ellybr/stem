@@ -126,7 +126,7 @@
                         <select id="form-teacher" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all appearance-none" required></select>
                     </div>
 
-                    <div class="space-y-10 bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100">
+                <div class="space-y-10 bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100">
                         <div class="space-y-4">
                             <div class="flex justify-between items-end">
                                 <div>
@@ -156,8 +156,44 @@
                                 <span id="v3" class="text-3xl font-black text-brand-pink bg-white px-4 py-1 rounded-2xl shadow-sm border border-slate-100">3</span>
                             </div>
                             <input type="range" id="s3" min="1" max="5" value="3" class="w-full" oninput="v3.innerText=this.value">
+                    </div>
+
+                    <div class="bg-white rounded-[2rem] border border-slate-100 p-6 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Indicator Rubric (1-4)</h3>
+                            <span class="text-[9px] font-black uppercase tracking-widest text-brand-pink">Quick Reference</span>
+                        </div>
+                        <div class="grid gap-6 md:grid-cols-3 text-[11px] text-slate-600 font-semibold">
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-black uppercase text-slate-900">Visible Scholar Thinking</h4>
+                                <ul class="space-y-2">
+                                    <li><span class="font-black text-slate-900">1:</span> Minimal notebooks; thinking mostly hidden.</li>
+                                    <li><span class="font-black text-slate-900">2:</span> Some notes; reasoning is partial.</li>
+                                    <li><span class="font-black text-slate-900">3:</span> Consistent notes; thinking is visible.</li>
+                                    <li><span class="font-black text-slate-900">4:</span> Rich annotations; students explain reasoning.</li>
+                                </ul>
+                            </div>
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-black uppercase text-slate-900">Problem Solving Mastery</h4>
+                                <ul class="space-y-2">
+                                    <li><span class="font-black text-slate-900">1:</span> Little strategy use; high confusion.</li>
+                                    <li><span class="font-black text-slate-900">2:</span> Emerging strategies; inconsistent success.</li>
+                                    <li><span class="font-black text-slate-900">3:</span> Clear strategy use; solid decoding.</li>
+                                    <li><span class="font-black text-slate-900">4:</span> Strategic mastery; students adapt approaches.</li>
+                                </ul>
+                            </div>
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-black uppercase text-slate-900">Goal Agency</h4>
+                                <ul class="space-y-2">
+                                    <li><span class="font-black text-slate-900">1:</span> Goals unclear; students passive.</li>
+                                    <li><span class="font-black text-slate-900">2:</span> Goals mentioned; limited ownership.</li>
+                                    <li><span class="font-black text-slate-900">3:</span> Students track goals and progress.</li>
+                                    <li><span class="font-black text-slate-900">4:</span> Students lead data talks and next steps.</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
+                </div>
 
                     <div class="space-y-2">
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Coherence Observations</label>
@@ -192,8 +228,7 @@
             <div class="flex-1">
                 <h4 class="font-black text-[11px] uppercase tracking-[0.3em] text-brand-pink mb-2 italic">The Coherence Mandate</h4>
                 <p class="text-base text-slate-900 leading-relaxed font-black italic">
-                    "Coherence is the glue of learning: if it doesn't stick today, we're stuck reteaching tomorrow. 
-                    Today's clarity pays for tomorrow's progress."
+                    "Precision in instruction builds momentum: clear thinking today creates confident problem solvers tomorrow."
                 </p>
             </div>
         </div>
