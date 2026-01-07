@@ -51,7 +51,7 @@
             <nav class="flex bg-white/10 p-1.5 rounded-2xl backdrop-blur-md border border-white/5">
                 <button id="btn-dash" class="tab-btn px-5 py-2 rounded-xl text-xs font-black transition-all tab-active uppercase tracking-widest">Dashboard</button>
                 <button id="btn-log" class="tab-btn px-5 py-2 rounded-xl text-xs font-black transition-all hover:bg-white/10 uppercase tracking-widest">Evidence Log</button>
-                <button id="btn-settings" class="tab-btn px-5 py-2 rounded-xl text-xs font-black transition-all hover:bg-white/10 uppercase tracking-widest">Staff</button>
+                <button id="btn-settings" class="tab-btn px-5 py-2 rounded-xl text-xs font-black transition-all hover:bg-white/10 uppercase tracking-widest">Directory</button>
             </nav>
         </div>
     </header>
@@ -192,6 +192,10 @@
                 <form id="obs-form" class="space-y-8">
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-2">Observer Name</label>
+                            <input type="text" id="form-observer" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all" placeholder="Observer Name">
+                        </div>
+                        <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-2">School</label>
                             <select id="form-school" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all appearance-none" required></select>
                         </div>
@@ -224,6 +228,18 @@
                             <input type="text" id="form-focus" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all" placeholder="Unit / Standard / Skill Focus" required>
                         </div>
                         <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-2">Sub-skill</label>
+                            <select id="form-subskill" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all appearance-none">
+                                <option value="">-- Select Sub-skill --</option>
+                                <option value="Conceptual Understanding">Conceptual Understanding</option>
+                                <option value="Procedural Fluency">Procedural Fluency</option>
+                                <option value="Application">Application</option>
+                                <option value="Reasoning & Proof">Reasoning & Proof</option>
+                                <option value="Modeling">Modeling</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-2">Subject</label>
                             <select id="form-subject" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all appearance-none" required>
                                 <option value="">-- Select Subject --</option>
@@ -248,8 +264,8 @@
                         </div>
                     </div>
 
-                <div class="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
-                    <div class="space-y-10 bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100">
+                <div class="grid gap-6 lg:grid-cols-3">
+                    <div class="bg-slate-50 p-6 rounded-[2.5rem] border border-slate-100 space-y-6">
                         <div class="space-y-4">
                             <div class="flex justify-between items-end">
                                 <div>
@@ -260,6 +276,17 @@
                             </div>
                             <input type="range" id="s1" min="1" max="4" value="3" class="w-full">
                         </div>
+                        <div class="space-y-3 text-xs text-slate-700 font-semibold leading-relaxed">
+                            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Rubric 1-4</p>
+                            <ul class="space-y-3">
+                                <li><span class="font-black text-slate-900">1:</span> Evidence: work shows answers only; no annotations or exit tickets collected. Action: students cannot explain their reasoning without prompts.</li>
+                                <li><span class="font-black text-slate-900">2:</span> Evidence: partial notes or occasional talk moves captured in samples. Action: students explain steps inconsistently or leave reasoning unfinished.</li>
+                                <li><span class="font-black text-slate-900">3:</span> Evidence: consistent annotated work, error analysis, or conferencing notes collected. Action: students explain reasoning with clear steps and representations.</li>
+                                <li><span class="font-black text-slate-900">4:</span> Evidence: multi-source artifacts over time show growth (work samples, exit tickets, talk moves). Action: students independently justify, compare strategies, and revise using evidence.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-[2.5rem] border border-slate-100 space-y-6">
                         <div class="space-y-4">
                             <div class="flex justify-between items-end">
                                 <div>
@@ -270,6 +297,17 @@
                             </div>
                             <input type="range" id="s2" min="1" max="4" value="3" class="w-full">
                         </div>
+                        <div class="space-y-3 text-xs text-slate-700 font-semibold leading-relaxed">
+                            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Rubric 1-4</p>
+                            <ul class="space-y-3">
+                                <li><span class="font-black text-slate-900">1:</span> Evidence: work shows misread prompts and incomplete steps. Action: students guess or start without selecting a strategy.</li>
+                                <li><span class="font-black text-slate-900">2:</span> Evidence: some steps recorded but strategy is mismatched or errors remain. Action: students identify the task with prompts and apply a strategy inconsistently.</li>
+                                <li><span class="font-black text-slate-900">3:</span> Evidence: recorded steps show correct strategy and accurate solution. Action: students explain how the strategy fits the question and check their work.</li>
+                                <li><span class="font-black text-slate-900">4:</span> Evidence: work samples show strategy choice, checks, and revisions across tasks. Action: students adapt strategies independently and reflect on learning.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-[2.5rem] border border-slate-100 space-y-6">
                         <div class="space-y-4">
                             <div class="flex justify-between items-end">
                                 <div>
@@ -280,42 +318,14 @@
                             </div>
                             <input type="range" id="s3" min="1" max="4" value="3" class="w-full">
                         </div>
-                    </div>
-
-                    <div class="bg-white rounded-[2rem] border border-slate-100 p-6 space-y-6">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Indicator Rubric (1-4)</h3>
-                            <span class="text-[9px] font-black uppercase tracking-widest text-brand-pink">Quick Reference</span>
-                        </div>
-                        <!-- Visible Scholar Thinking: evidence of reasoning + captured progress-monitoring artifacts. Problem Solving Mastery: strategy selection, accurate application, reflection. Goal Agency: student-owned data goals and plan adjustments. -->
-                        <div class="space-y-6 text-xs text-slate-700 font-semibold leading-relaxed">
-                            <div class="space-y-3">
-                                <h4 class="text-xs font-black uppercase text-slate-900">Visible Scholar Thinking</h4>
-                                <ul class="space-y-3">
-                                    <li><span class="font-black text-slate-900">1:</span> Evidence: work shows answers only; no annotations or exit tickets collected. Action: students cannot explain their reasoning without prompts.</li>
-                                    <li><span class="font-black text-slate-900">2:</span> Evidence: partial notes or occasional talk moves captured in samples. Action: students explain steps inconsistently or leave reasoning unfinished.</li>
-                                    <li><span class="font-black text-slate-900">3:</span> Evidence: consistent annotated work, error analysis, or conferencing notes collected. Action: students explain reasoning with clear steps and representations.</li>
-                                    <li><span class="font-black text-slate-900">4:</span> Evidence: multi-source artifacts over time show growth (work samples, exit tickets, talk moves). Action: students independently justify, compare strategies, and revise using evidence.</li>
-                                </ul>
-                            </div>
-                            <div class="space-y-3">
-                                <h4 class="text-xs font-black uppercase text-slate-900">Problem Solving Mastery</h4>
-                                <ul class="space-y-3">
-                                    <li><span class="font-black text-slate-900">1:</span> Evidence: work shows misread prompts and incomplete steps. Action: students guess or start without selecting a strategy.</li>
-                                    <li><span class="font-black text-slate-900">2:</span> Evidence: some steps recorded but strategy is mismatched or errors remain. Action: students identify the task with prompts and apply a strategy inconsistently.</li>
-                                    <li><span class="font-black text-slate-900">3:</span> Evidence: recorded steps show correct strategy and accurate solution. Action: students explain how the strategy fits the question and check their work.</li>
-                                    <li><span class="font-black text-slate-900">4:</span> Evidence: work samples show strategy choice, checks, and revisions across tasks. Action: students adapt strategies independently and reflect on learning.</li>
-                                </ul>
-                            </div>
-                            <div class="space-y-3">
-                                <h4 class="text-xs font-black uppercase text-slate-900">Goal Agency</h4>
-                                <ul class="space-y-3">
-                                    <li><span class="font-black text-slate-900">1:</span> Evidence: no tracked data or goal sheet present. Action: students cannot state current scores or next steps.</li>
-                                    <li><span class="font-black text-slate-900">2:</span> Evidence: goal sheets exist but updates are sporadic. Action: students state a goal with prompts and follow a teacher-directed plan.</li>
-                                    <li><span class="font-black text-slate-900">3:</span> Evidence: data trackers show regular updates and checkpoints. Action: students state current data, goal, and explain their plan.</li>
-                                    <li><span class="font-black text-slate-900">4:</span> Evidence: progress monitoring logs show adjustments after checks. Action: students lead data conversations, adjust plans, and articulate next steps.</li>
-                                </ul>
-                            </div>
+                        <div class="space-y-3 text-xs text-slate-700 font-semibold leading-relaxed">
+                            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Rubric 1-4</p>
+                            <ul class="space-y-3">
+                                <li><span class="font-black text-slate-900">1:</span> Evidence: no tracked data or goal sheet present. Action: students cannot state current scores or next steps.</li>
+                                <li><span class="font-black text-slate-900">2:</span> Evidence: goal sheets exist but updates are sporadic. Action: students state a goal with prompts and follow a teacher-directed plan.</li>
+                                <li><span class="font-black text-slate-900">3:</span> Evidence: data trackers show regular updates and checkpoints. Action: students state current data, goal, and explain their plan.</li>
+                                <li><span class="font-black text-slate-900">4:</span> Evidence: progress monitoring logs show adjustments after checks. Action: students lead data conversations, adjust plans, and articulate next steps.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -670,10 +680,12 @@
             const ts = parseObservationTimestamp(obsDate, obsTime);
             const dateLabel = formatDateLabel(obsDate, obsTime, ts);
             const entry = {
+                observerName: document.getElementById('form-observer').value.trim(),
                 school: document.getElementById('form-school').value,
                 teacher: document.getElementById('form-teacher').value,
                 gradeLevel: document.getElementById('form-grade').value,
                 contentFocus: document.getElementById('form-focus').value.trim(),
+                subSkill: document.getElementById('form-subskill').value,
                 subjectArea: document.getElementById('form-subject').value,
                 standardCode: document.getElementById('form-standard').value.trim(),
                 obsDate,
@@ -770,7 +782,9 @@
                 const focusText = o.contentFocus || 'NA';
                 const subjectText = o.subjectArea || 'NA';
                 const standardText = o.standardCode || 'NA';
-                sub.textContent = `${schoolText} • Grade ${gradeText} • ${subjectText} • ${focusText} • ${standardText}`;
+                const observerText = o.observerName || 'NA';
+                const subSkillText = o.subSkill || 'NA';
+                sub.textContent = `${schoolText} • Grade ${gradeText} • ${subjectText} • ${focusText} • ${standardText} • ${subSkillText} • Obs: ${observerText}`;
                 meta.appendChild(name);
                 meta.appendChild(date);
                 meta.appendChild(sub);
