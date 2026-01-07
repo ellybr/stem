@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Blueprint Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .bg-brand-midnight { background-color: #0f172a; }
+        .text-brand-pink { color: #f472b6; }
+        .bg-brand-pink { background-color: #f472b6; }
+        .border-brand-pink { border-color: #f472b6; }
+        
+        .tab-active { 
+            background-color: white; 
+            color: #0f172a; 
+            box-shadow: 0 10px 25px -5px rgba(244, 114, 182, 0.3);
+            border: 2px solid #f472b6;
+        }
+        
+        input[type="range"] { -webkit-appearance: none; background: transparent; }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px; width: 24px; border-radius: 50%;
+            background: #f472b6; border: 3px solid #ffffff;
+            cursor: pointer; margin-top: -8px;
+            box-shadow: 0 4px 10px rgba(244, 114, 182, 0.4);
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen pb-16">
+
+    <!-- HEADER -->
+    <header class="bg-brand-midnight text-white p-6 sticky top-0 z-50 border-b-4 border-brand-pink shadow-xl">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center font-black text-slate-900 text-2xl shadow-lg border-2 border-brand-pink">B</div>
+                <div>
+                    <h1 class="text-2xl font-black uppercase tracking-tighter italic leading-none">The Blueprint Engine</h1>
+                    <p class="text-brand-pink text-[10px] font-bold tracking-[0.3em] uppercase mt-1">STEM Instructional Navigator</p>
+                </div>
+            </div>
+            <nav class="flex bg-white/10 p-1.5 rounded-2xl backdrop-blur-md border border-white/5">
+                <button id="btn-dash" class="tab-btn px-5 py-2 rounded-xl text-xs font-black transition-all tab-active uppercase tracking-widest">Dashboard</button>
+                <button id="btn-log" class="tab-btn px-5 py-2 rounded-xl text-xs font-black transition-all hover:bg-white/10 uppercase tracking-widest">Evidence Log</button>
+                <button id="btn-settings" class="tab-btn px-5 py-2 rounded-xl text-xs font-black transition-all hover:bg-white/10 uppercase tracking-widest">Staff</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-4 md:p-8 space-y-8">
+        
+        <!-- DASHBOARD -->
+        <section id="tab-dash" class="tab-content space-y-6">
+            <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
+                <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4">Dashboard Filters</h3>
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                        <label class="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">School</label>
+                        <select id="filter-school" class="w-full p-3 bg-slate-50 rounded-2xl font-bold border border-slate-200"></select>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">Teacher</label>
+                        <select id="filter-teacher" class="w-full p-3 bg-slate-50 rounded-2xl font-bold border border-slate-200"></select>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">Grade Level</label>
+                        <select id="filter-grade" class="w-full p-3 bg-slate-50 rounded-2xl font-bold border border-slate-200"></select>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">Content Focus</label>
+                        <select id="filter-focus" class="w-full p-3 bg-slate-50 rounded-2xl font-bold border border-slate-200"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border-t-4 border-slate-900">
+                    <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Visible Scholar Thinking</p>
+                    <p id="avg-1" class="text-5xl font-black text-slate-900">0.0</p>
+                    <div class="mt-3 flex items-center gap-1 text-slate-400">
+                        <i data-lucide="book" class="w-3 h-3"></i>
+                        <span class="text-[9px] font-bold uppercase tracking-tighter">Learning Guides & Notebooks</span>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border-t-4 border-emerald-500">
+                    <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Problem Solving Mastery</p>
+                    <p id="avg-2" class="text-5xl font-black text-emerald-600">0.0</p>
+                    <div class="mt-3 flex items-center gap-1 text-slate-400">
+                        <i data-lucide="brain" class="w-3 h-3"></i>
+                        <span class="text-[9px] font-bold uppercase tracking-tighter">Strategic Decoding Mastery</span>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border-t-4 border-brand-pink">
+                    <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Goal Agency</p>
+                    <p id="avg-3" class="text-5xl font-black text-brand-pink">0.0</p>
+                    <div class="mt-3 flex items-center gap-1 text-slate-400">
+                        <i data-lucide="rocket" class="w-3 h-3"></i>
+                        <span class="text-[9px] font-bold uppercase tracking-tighter">Scholar Data Ownership</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-100 h-80 relative">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4">Core Indicator Balance</h3>
+                    <canvas id="radarChart"></canvas>
+                    <p id="radar-empty" class="absolute inset-0 flex items-center justify-center text-[10px] font-black uppercase tracking-widest text-slate-300">
+                        Log evidence to populate the radar chart.
+                    </p>
+                </div>
+                <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-100 h-80 relative">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4">Growth Trajectory</h3>
+                    <canvas id="lineChart"></canvas>
+                    <p id="line-empty" class="absolute inset-0 flex items-center justify-center text-[10px] font-black uppercase tracking-widest text-slate-300">
+                        Log observations to see growth over time.
+                    </p>
+                </div>
+            </div>
+
+            <div id="coaching-panel" class="bg-white rounded-[3rem] shadow-sm border border-slate-200 overflow-hidden hidden">
+                <div class="p-6 bg-slate-50 border-b border-slate-100 flex flex-col gap-4">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <h3 class="font-black text-[10px] uppercase text-slate-400 tracking-[0.2em]">Coaching Next Steps</h3>
+                            <p id="coaching-focus" class="text-xl font-black text-slate-900 mt-2"></p>
+                            <p id="coaching-why" class="text-xs text-slate-500 font-medium italic mt-2"></p>
+                        </div>
+                        <button id="copy-coach-notes" type="button" class="bg-brand-midnight text-white px-5 py-3 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-brand-pink transition-colors">
+                            Copy Coach Notes
+                        </button>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="bg-white rounded-2xl border border-slate-100 p-4">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Coaching Moves</p>
+                            <ul id="coaching-moves" class="space-y-2 text-xs text-slate-600 font-semibold"></ul>
+                        </div>
+                        <div class="bg-white rounded-2xl border border-slate-100 p-4">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Look-fors</p>
+                            <ul id="coaching-lookfors" class="space-y-2 text-xs text-slate-600 font-semibold"></ul>
+                        </div>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="bg-white rounded-2xl border border-slate-100 p-4">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Coach Script</p>
+                            <p id="coaching-script" class="text-xs text-slate-600 font-semibold"></p>
+                        </div>
+                        <div class="bg-white rounded-2xl border border-slate-100 p-4">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Micro-goal</p>
+                            <p id="coaching-microgoal" class="text-xs text-slate-600 font-semibold"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Track Coaching Moves</h4>
+                        <span id="coaching-selected-summary" class="text-[9px] font-black uppercase tracking-widest text-brand-pink"></span>
+                    </div>
+                    <div id="coaching-submoves" class="flex flex-wrap gap-2"></div>
+                    <p id="coaching-empty" class="text-[10px] font-black uppercase tracking-widest text-slate-300 mt-4 hidden">No coaching moves tracked yet.</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[3rem] shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 bg-slate-50 border-b border-slate-100">
+                    <h3 class="font-black text-[10px] uppercase text-slate-400 tracking-[0.2em]">Recent Evidence Logs</h3>
+                </div>
+                <div id="log-list" class="divide-y divide-slate-50"></div>
+            </div>
+        </section>
+
+        <!-- LOGGING -->
+        <section id="tab-log" class="tab-content hidden max-w-xl mx-auto">
+            <div class="bg-white p-10 rounded-[3.5rem] shadow-2xl border-t-8 border-brand-pink">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-black text-slate-900 italic">Log Evidence</h2>
+                    <p class="text-brand-pink text-[10px] font-black uppercase tracking-[0.3em] mt-2 underline decoration-2 underline-offset-4">Tracking Classroom Coherence</p>
+                </div>
+
+                <form id="obs-form" class="space-y-8">
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-2">School</label>
+                            <select id="form-school" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all appearance-none" required></select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-2">Teacher</label>
+                            <select id="form-teacher" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all appearance-none" required></select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-2">Grade Level</label>
+                            <select id="form-grade" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all appearance-none" required>
+                                <option value="">-- Select Grade --</option>
+                                <option value="K">K</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-2">Content Focus</label>
+                            <input type="text" id="form-focus" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all" placeholder="Unit / Standard / Skill Focus" required>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-2">Date of Observation</label>
+                            <input type="date" id="form-date" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all" required>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-2">Time of Observation</label>
+                            <input type="time" id="form-time" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border border-slate-200 outline-none focus:ring-4 focus:ring-pink-100 transition-all" required>
+                        </div>
+                    </div>
+
+                <div class="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
+                    <div class="space-y-10 bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <h4 class="text-xs font-black text-slate-900 uppercase italic">Visible Scholar Thinking</h4>
+                                    <p class="text-[10px] text-slate-500 font-medium italic">Notebooks active and mapped?</p>
+                                </div>
+                                <span id="v1" class="text-3xl font-black text-slate-900 bg-white px-4 py-1 rounded-2xl shadow-sm border border-slate-100">3</span>
+                            </div>
+                            <input type="range" id="s1" min="1" max="4" value="3" class="w-full">
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <h4 class="text-xs font-black text-slate-900 uppercase italic">Problem Solving Mastery</h4>
+                                    <p class="text-[10px] text-slate-500 font-medium italic">Scholars decoding Tier 1 tasks?</p>
+                                </div>
+                                <span id="v2" class="text-3xl font-black text-emerald-600 bg-white px-4 py-1 rounded-2xl shadow-sm border border-slate-100">3</span>
+                            </div>
+                            <input type="range" id="s2" min="1" max="4" value="3" class="w-full">
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <h4 class="text-xs font-black text-slate-900 uppercase italic">Goal Agency</h4>
+                                    <p class="text-[10px] text-slate-500 font-medium italic">Evidence of MAP target pursuit?</p>
+                                </div>
+                                <span id="v3" class="text-3xl font-black text-brand-pink bg-white px-4 py-1 rounded-2xl shadow-sm border border-slate-100">3</span>
+                            </div>
+                            <input type="range" id="s3" min="1" max="4" value="3" class="w-full">
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-[2rem] border border-slate-100 p-6 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Indicator Rubric (1-4)</h3>
+                            <span class="text-[9px] font-black uppercase tracking-widest text-brand-pink">Quick Reference</span>
+                        </div>
+                        <!-- Visible Scholar Thinking: evidence of reasoning + captured progress-monitoring artifacts. Problem Solving Mastery: strategy selection, accurate application, reflection. Goal Agency: student-owned data goals and plan adjustments. -->
+                        <div class="space-y-6 text-[11px] text-slate-600 font-semibold">
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-black uppercase text-slate-900">Visible Scholar Thinking</h4>
+                                <ul class="space-y-2">
+                                    <li><span class="font-black text-slate-900">1:</span> Evidence: work shows answers only; no annotations or exit tickets collected. Action: students cannot explain their reasoning without prompts.</li>
+                                    <li><span class="font-black text-slate-900">2:</span> Evidence: partial notes or occasional talk moves captured in samples. Action: students explain steps inconsistently or leave reasoning unfinished.</li>
+                                    <li><span class="font-black text-slate-900">3:</span> Evidence: consistent annotated work, error analysis, or conferencing notes collected. Action: students explain reasoning with clear steps and representations.</li>
+                                    <li><span class="font-black text-slate-900">4:</span> Evidence: multi-source artifacts over time show growth (work samples, exit tickets, talk moves). Action: students independently justify, compare strategies, and revise using evidence.</li>
+                                </ul>
+                            </div>
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-black uppercase text-slate-900">Problem Solving Mastery</h4>
+                                <ul class="space-y-2">
+                                    <li><span class="font-black text-slate-900">1:</span> Evidence: work shows misread prompts and incomplete steps. Action: students guess or start without selecting a strategy.</li>
+                                    <li><span class="font-black text-slate-900">2:</span> Evidence: some steps recorded but strategy is mismatched or errors remain. Action: students identify the task with prompts and apply a strategy inconsistently.</li>
+                                    <li><span class="font-black text-slate-900">3:</span> Evidence: recorded steps show correct strategy and accurate solution. Action: students explain how the strategy fits the question and check their work.</li>
+                                    <li><span class="font-black text-slate-900">4:</span> Evidence: work samples show strategy choice, checks, and revisions across tasks. Action: students adapt strategies independently and reflect on learning.</li>
+                                </ul>
+                            </div>
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-black uppercase text-slate-900">Goal Agency</h4>
+                                <ul class="space-y-2">
+                                    <li><span class="font-black text-slate-900">1:</span> Evidence: no tracked data or goal sheet present. Action: students cannot state current scores or next steps.</li>
+                                    <li><span class="font-black text-slate-900">2:</span> Evidence: goal sheets exist but updates are sporadic. Action: students state a goal with prompts and follow a teacher-directed plan.</li>
+                                    <li><span class="font-black text-slate-900">3:</span> Evidence: data trackers show regular updates and checkpoints. Action: students state current data, goal, and explain their plan.</li>
+                                    <li><span class="font-black text-slate-900">4:</span> Evidence: progress monitoring logs show adjustments after checks. Action: students lead data conversations, adjust plans, and articulate next steps.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Coherence Observations</label>
+                        <textarea id="form-notes" placeholder="Notes on instructional alignment..." class="w-full p-5 bg-slate-50 border border-slate-200 rounded-3xl outline-none focus:ring-4 focus:ring-pink-100 min-h-[140px] text-sm italic"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-slate-900 text-white font-black py-6 rounded-[2.5rem] uppercase tracking-[0.25em] shadow-xl hover:bg-black active:scale-95 transition-all text-sm border-b-4 border-brand-pink">
+                        Log to Blueprint
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="tab-settings" class="tab-content hidden max-w-lg mx-auto">
+            <div class="bg-white p-10 rounded-[3rem] shadow-xl border border-slate-200">
+                <h2 class="text-lg font-black mb-1 text-slate-900 uppercase italic">Staff Management</h2>
+                <div class="flex gap-2 mb-8 mt-4">
+                    <input type="text" id="new-t" class="flex-1 p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold" placeholder="Teacher Name">
+                    <button id="add-teacher-btn" type="button" class="bg-brand-midnight text-white px-6 rounded-2xl font-black hover:bg-brand-pink transition-colors">ADD</button>
+                </div>
+                <div id="t-list" class="space-y-2"></div>
+                <h2 class="text-lg font-black mt-10 mb-1 text-slate-900 uppercase italic">School Management</h2>
+                <div class="flex gap-2 mb-8 mt-4">
+                    <input type="text" id="new-school" class="flex-1 p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold" placeholder="School Name">
+                    <button id="add-school-btn" type="button" class="bg-brand-midnight text-white px-6 rounded-2xl font-black hover:bg-brand-pink transition-colors">ADD</button>
+                </div>
+                <div id="school-list" class="space-y-2"></div>
+                <button id="clear-data-btn" type="button" class="w-full mt-10 text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-widest">Wipe Local History</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER QUOTE -->
+    <footer class="max-w-5xl mx-auto px-4 mt-8">
+        <div class="bg-white p-10 rounded-[4rem] border-2 border-slate-100 flex flex-col md:flex-row gap-8 items-center shadow-lg relative overflow-hidden">
+            <div class="p-5 bg-pink-50 rounded-[2rem] border border-pink-100"><i data-lucide="sparkles" class="text-brand-pink w-10 h-10"></i></div>
+            <div class="flex-1">
+                <h4 class="font-black text-[11px] uppercase tracking-[0.3em] text-brand-pink mb-2 italic">The Coherence Mandate</h4>
+                <p class="text-base text-slate-900 leading-relaxed font-black italic">
+                    "Precision in instruction builds momentum: clear thinking today creates confident problem solvers tomorrow."
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const storage = (() => {
+            try {
+                const probe = '__bp_probe__';
+                localStorage.setItem(probe, probe);
+                localStorage.removeItem(probe);
+                return localStorage;
+            } catch (err) {
+                return {
+                    getItem: () => null,
+                    setItem: () => {},
+                    removeItem: () => {}
+                };
+            }
+        })();
+
+        let teachers = JSON.parse(storage.getItem('bp_engine_staff')) || ['Instructor Alpha', 'Instructor Beta'];
+        let schools = JSON.parse(storage.getItem('bp_engine_schools')) || ['Central STEM Academy'];
+        let obs = JSON.parse(storage.getItem('bp_engine_data')) || [];
+        let coachingData = JSON.parse(storage.getItem('bp_engine_coaching')) || {};
+        let rChart, lChart;
+
+        function init() {
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+            bindEvents();
+            setDefaultDateTime();
+            renderT();
+            renderSchools();
+            renderFilters();
+            renderL();
+            updateC();
+        }
+
+        function setDefaultDateTime() {
+            const dateInput = document.getElementById('form-date');
+            const timeInput = document.getElementById('form-time');
+            const now = new Date();
+            if (dateInput) {
+                dateInput.value = now.toISOString().slice(0, 10);
+            }
+            if (timeInput) {
+                const rounded = roundToFiveMinutes(now);
+                timeInput.value = formatTimeValue(rounded);
+            }
+        }
+
+        function roundToFiveMinutes(date) {
+            const rounded = new Date(date);
+            const minutes = rounded.getMinutes();
+            const roundedMinutes = Math.round(minutes / 5) * 5;
+            rounded.setMinutes(roundedMinutes);
+            rounded.setSeconds(0, 0);
+            return rounded;
+        }
+
+        function formatTimeValue(date) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        function parseObservationTimestamp(dateValue, timeValue) {
+            if (dateValue && timeValue) {
+                const parsed = new Date(`${dateValue}T${timeValue}`);
+                if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.getTime();
+                }
+            }
+            return Date.now();
+        }
+
+        function formatDateLabel(dateValue, timeValue, fallbackTs) {
+            if (dateValue && timeValue) {
+                const parsed = new Date(`${dateValue}T${timeValue}`);
+                if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }) + ` ${timeValue}`;
+                }
+            }
+            const fallback = new Date(fallbackTs);
+            return fallback.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }) + ` ${formatTimeValue(fallback)}`;
+        }
+
+        function bindEvents() {
+            const tabButtons = [
+                { id: 'btn-dash', tab: 'dash' },
+                { id: 'btn-log', tab: 'log' },
+                { id: 'btn-settings', tab: 'settings' }
+            ];
+            tabButtons.forEach(({ id, tab }) => {
+                const button = document.getElementById(id);
+                if (button) {
+                    button.addEventListener('click', () => showTab(tab));
+                }
+            });
+
+            const sliders = [
+                { sliderId: 's1', valueId: 'v1' },
+                { sliderId: 's2', valueId: 'v2' },
+                { sliderId: 's3', valueId: 'v3' }
+            ];
+            sliders.forEach(({ sliderId, valueId }) => {
+                const slider = document.getElementById(sliderId);
+                const value = document.getElementById(valueId);
+                if (slider && value) {
+                    slider.addEventListener('input', () => {
+                        value.innerText = slider.value;
+                    });
+                }
+            });
+
+            const addButton = document.getElementById('add-teacher-btn');
+            if (addButton) {
+                addButton.addEventListener('click', addT);
+            }
+
+            const addSchoolButton = document.getElementById('add-school-btn');
+            if (addSchoolButton) {
+                addSchoolButton.addEventListener('click', addSchool);
+            }
+
+            const clearButton = document.getElementById('clear-data-btn');
+            if (clearButton) {
+                clearButton.addEventListener('click', clearData);
+            }
+
+            ['filter-school', 'filter-teacher', 'filter-grade', 'filter-focus'].forEach(id => {
+                const filter = document.getElementById(id);
+                if (filter) {
+                    filter.addEventListener('change', () => {
+                        renderL();
+                        updateC();
+                    });
+                }
+            });
+
+            const copyButton = document.getElementById('copy-coach-notes');
+            if (copyButton) {
+                copyButton.addEventListener('click', copyCoachNotes);
+            }
+        }
+
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('tab-active'));
+            document.getElementById('tab-' + id).classList.remove('hidden');
+            document.getElementById('btn-' + id).classList.add('tab-active');
+        }
+
+        function renderT() {
+            const list = document.getElementById('t-list');
+            const select = document.getElementById('form-teacher');
+            list.innerHTML = '';
+            select.innerHTML = '';
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = '-- Choose Staff --';
+            select.appendChild(placeholder);
+            teachers.sort().forEach(t => {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 font-bold text-sm';
+                const name = document.createElement('span');
+                name.textContent = t;
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'text-red-300';
+                remove.textContent = '×';
+                remove.addEventListener('click', () => remT(t));
+                row.appendChild(name);
+                row.appendChild(remove);
+                list.appendChild(row);
+
+                const option = document.createElement('option');
+                option.value = t;
+                option.textContent = t;
+                select.appendChild(option);
+            });
+            storage.setItem('bp_engine_staff', JSON.stringify(teachers));
+            renderFilters();
+        }
+
+        function renderSchools() {
+            const list = document.getElementById('school-list');
+            const select = document.getElementById('form-school');
+            list.innerHTML = '';
+            select.innerHTML = '';
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = '-- Choose School --';
+            select.appendChild(placeholder);
+            schools.sort().forEach(school => {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 font-bold text-sm';
+                const name = document.createElement('span');
+                name.textContent = school;
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'text-red-300';
+                remove.textContent = '×';
+                remove.addEventListener('click', () => removeSchool(school));
+                row.appendChild(name);
+                row.appendChild(remove);
+                list.appendChild(row);
+
+                const option = document.createElement('option');
+                option.value = school;
+                option.textContent = school;
+                select.appendChild(option);
+            });
+            storage.setItem('bp_engine_schools', JSON.stringify(schools));
+            renderFilters();
+        }
+
+        function renderFilters() {
+            const schoolFilter = document.getElementById('filter-school');
+            const teacherFilter = document.getElementById('filter-teacher');
+            const gradeFilter = document.getElementById('filter-grade');
+            const focusFilter = document.getElementById('filter-focus');
+            if (!schoolFilter || !teacherFilter || !gradeFilter || !focusFilter) {
+                return;
+            }
+
+            const filteredGrades = getUniqueValues(obs, 'gradeLevel');
+            const filteredFocus = getUniqueValues(obs, 'contentFocus');
+
+            populateSelect(schoolFilter, ['All', ...schools]);
+            populateSelect(teacherFilter, ['All', ...teachers]);
+            populateSelect(gradeFilter, ['All', ...filteredGrades]);
+            populateSelect(focusFilter, ['All', ...filteredFocus]);
+        }
+
+        function populateSelect(select, options) {
+            const current = select.value;
+            select.innerHTML = '';
+            options.forEach(optionValue => {
+                const option = document.createElement('option');
+                option.value = optionValue === 'All' ? '' : optionValue;
+                option.textContent = optionValue;
+                select.appendChild(option);
+            });
+            select.value = options.includes(current) ? current : '';
+        }
+
+        function getUniqueValues(list, key) {
+            return [...new Set(list.map(item => (item[key] || '').trim()).filter(Boolean))].sort();
+        }
+
+        function addT() {
+            const input = document.getElementById('new-t');
+            const rawName = input.value.trim();
+            if (!rawName) {
+                return;
+            }
+            const normalized = rawName.toLowerCase();
+            const exists = teachers.some(t => t.trim().toLowerCase() === normalized);
+            if (!exists) {
+                teachers.push(rawName);
+                renderT();
+            }
+            input.value = '';
+        }
+
+        function addSchool() {
+            const input = document.getElementById('new-school');
+            const rawName = input.value.trim();
+            if (!rawName) {
+                return;
+            }
+            const normalized = rawName.toLowerCase();
+            const exists = schools.some(s => s.trim().toLowerCase() === normalized);
+            if (!exists) {
+                schools.push(rawName);
+                renderSchools();
+            }
+            input.value = '';
+        }
+
+        function remT(n) { teachers = teachers.filter(t => t !== n); renderT(); }
+
+        function removeSchool(name) { schools = schools.filter(s => s !== name); renderSchools(); }
+
+        function clearData() {
+            if (confirm("Clear local data?")) {
+                obs = [];
+                coachingData = {};
+                storage.setItem('bp_engine_data', JSON.stringify(obs));
+                storage.setItem('bp_engine_coaching', JSON.stringify(coachingData));
+                renderFilters();
+                renderL();
+                updateC();
+            }
+        }
+
+        document.getElementById('obs-form').onsubmit = function(e) {
+            e.preventDefault();
+            const obsDate = document.getElementById('form-date').value;
+            const obsTime = document.getElementById('form-time').value;
+            const ts = parseObservationTimestamp(obsDate, obsTime);
+            const dateLabel = formatDateLabel(obsDate, obsTime, ts);
+            const entry = {
+                school: document.getElementById('form-school').value,
+                teacher: document.getElementById('form-teacher').value,
+                gradeLevel: document.getElementById('form-grade').value,
+                contentFocus: document.getElementById('form-focus').value.trim(),
+                obsDate,
+                obsTime,
+                ts,
+                dateLabel,
+                s1: parseInt(document.getElementById('s1').value),
+                s2: parseInt(document.getElementById('s2').value),
+                s3: parseInt(document.getElementById('s3').value),
+                notes: document.getElementById('form-notes').value,
+                id: ts
+            };
+            obs.unshift(entry);
+            const ideas = generateCoachingIdeas(entry, 4);
+            coachingData[entry.id] = {
+                ideas,
+                selectedSubMoves: []
+            };
+            storage.setItem('bp_engine_data', JSON.stringify(obs));
+            storage.setItem('bp_engine_coaching', JSON.stringify(coachingData));
+            this.reset();
+            const defaultValue = '3';
+            ['s1', 's2', 's3'].forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider) {
+                    slider.value = defaultValue;
+                }
+            });
+            ['v1', 'v2', 'v3'].forEach(id => {
+                const value = document.getElementById(id);
+                if (value) {
+                    value.innerText = defaultValue;
+                }
+            });
+            setDefaultDateTime();
+            renderFilters();
+            renderL(); updateC(); showTab('dash');
+        }
+
+        function getFilteredObs() {
+            const schoolFilter = document.getElementById('filter-school');
+            const teacherFilter = document.getElementById('filter-teacher');
+            const gradeFilter = document.getElementById('filter-grade');
+            const focusFilter = document.getElementById('filter-focus');
+            const schoolValue = schoolFilter ? schoolFilter.value : '';
+            const teacherValue = teacherFilter ? teacherFilter.value : '';
+            const gradeValue = gradeFilter ? gradeFilter.value : '';
+            const focusValue = focusFilter ? focusFilter.value : '';
+
+            return obs.filter(item => {
+                const schoolMatch = !schoolValue || (item.school || '').toLowerCase() === schoolValue.toLowerCase();
+                const teacherMatch = !teacherValue || (item.teacher || item.t || '').toLowerCase() === teacherValue.toLowerCase();
+                const gradeMatch = !gradeValue || (item.gradeLevel || '').toLowerCase() === gradeValue.toLowerCase();
+                const focusMatch = !focusValue || (item.contentFocus || '').toLowerCase() === focusValue.toLowerCase();
+                return schoolMatch && teacherMatch && gradeMatch && focusMatch;
+            });
+        }
+
+        function renderL() {
+            const list = document.getElementById('log-list');
+            list.innerHTML = '';
+            const filtered = getFilteredObs();
+            if (!filtered.length) {
+                const empty = document.createElement('div');
+                empty.className = 'p-20 text-center text-slate-300 italic text-xs font-bold uppercase tracking-widest';
+                empty.textContent = 'No evidence matches the current filters.';
+                list.appendChild(empty);
+            }
+            let s1 = 0;
+            let s2 = 0;
+            let s3 = 0;
+            filtered.forEach(o => {
+                s1 += o.s1;
+                s2 += o.s2;
+                s3 += o.s3;
+                const row = document.createElement('div');
+                row.className = 'p-6 flex flex-col md:flex-row gap-6 items-start md:items-center hover:bg-slate-50 transition-colors';
+
+                const meta = document.createElement('div');
+                meta.className = 'min-w-[180px]';
+                const name = document.createElement('p');
+                name.className = 'font-black text-sm text-slate-900';
+                name.textContent = o.teacher || o.t || 'NA';
+                const date = document.createElement('p');
+                date.className = 'text-[9px] text-slate-400 font-black tracking-widest uppercase';
+                date.textContent = o.dateLabel || o.date || 'NA';
+                const sub = document.createElement('p');
+                sub.className = 'text-[9px] text-slate-400 font-black tracking-widest uppercase';
+                const schoolText = o.school || 'NA';
+                const gradeText = o.gradeLevel || 'NA';
+                const focusText = o.contentFocus || 'NA';
+                sub.textContent = `${schoolText} • Grade ${gradeText} • ${focusText}`;
+                meta.appendChild(name);
+                meta.appendChild(date);
+                meta.appendChild(sub);
+
+                const scores = document.createElement('div');
+                scores.className = 'flex gap-2';
+                const s1Badge = document.createElement('span');
+                s1Badge.className = 'w-8 h-8 flex items-center justify-center bg-slate-100 text-slate-900 rounded-xl text-[10px] font-black border border-slate-200';
+                s1Badge.textContent = o.s1;
+                const s2Badge = document.createElement('span');
+                s2Badge.className = 'w-8 h-8 flex items-center justify-center bg-emerald-50 text-emerald-700 rounded-xl text-[10px] font-black border border-emerald-100';
+                s2Badge.textContent = o.s2;
+                const s3Badge = document.createElement('span');
+                s3Badge.className = 'w-8 h-8 flex items-center justify-center bg-pink-50 text-pink-600 rounded-xl text-[10px] font-black border border-pink-100';
+                s3Badge.textContent = o.s3;
+                scores.appendChild(s1Badge);
+                scores.appendChild(s2Badge);
+                scores.appendChild(s3Badge);
+
+                const notes = document.createElement('p');
+                notes.className = 'text-xs text-slate-500 font-medium italic flex-1 border-l border-slate-100 pl-6';
+                notes.textContent = `"${o.notes || 'Instructional coherence alignment.'}"`;
+
+                row.appendChild(meta);
+                row.appendChild(scores);
+                row.appendChild(notes);
+                list.appendChild(row);
+            });
+            const c = filtered.length;
+            document.getElementById('avg-1').innerText = c ? (s1 / c).toFixed(1) : '0.0';
+            document.getElementById('avg-2').innerText = c ? (s2 / c).toFixed(1) : '0.0';
+            document.getElementById('avg-3').innerText = c ? (s3 / c).toFixed(1) : '0.0';
+            renderCoachingPanel(filtered);
+        }
+
+        function renderCoachingPanel(filtered) {
+            const panel = document.getElementById('coaching-panel');
+            if (!panel) {
+                return;
+            }
+            if (!filtered.length) {
+                panel.classList.add('hidden');
+                return;
+            }
+            const latest = [...filtered].sort((a, b) => (b.ts || 0) - (a.ts || 0))[0];
+            if (!latest) {
+                panel.classList.add('hidden');
+                return;
+            }
+
+            const stored = coachingData[latest.id];
+            const ideas = stored?.ideas || generateCoachingIdeas(latest, 4);
+            const selected = stored?.selectedSubMoves || [];
+
+            panel.classList.remove('hidden');
+            document.getElementById('coaching-focus').textContent = ideas.focusDimension;
+            document.getElementById('coaching-why').textContent = ideas.whyThisFocus;
+            document.getElementById('coaching-script').textContent = ideas.coachScript;
+            document.getElementById('coaching-microgoal').textContent = ideas.microGoal;
+
+            const movesList = document.getElementById('coaching-moves');
+            movesList.innerHTML = '';
+            ideas.moves.forEach(move => {
+                const item = document.createElement('li');
+                item.textContent = move;
+                movesList.appendChild(item);
+            });
+
+            const lookForsList = document.getElementById('coaching-lookfors');
+            lookForsList.innerHTML = '';
+            ideas.lookFors.forEach(look => {
+                const item = document.createElement('li');
+                item.textContent = look;
+                lookForsList.appendChild(item);
+            });
+
+            const subMovesWrap = document.getElementById('coaching-submoves');
+            subMovesWrap.innerHTML = '';
+            ideas.subMoves.forEach(subMove => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'px-3 py-2 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-colors';
+                const isActive = selected.includes(subMove.id);
+                button.classList.add(isActive ? 'bg-brand-pink text-white border-brand-pink' : 'bg-slate-50 text-slate-600 border-slate-200');
+                button.textContent = subMove.label;
+                button.title = subMove.description;
+                button.addEventListener('click', () => {
+                    toggleSubMove(latest.id, subMove.id);
+                });
+                subMovesWrap.appendChild(button);
+            });
+
+            const summary = document.getElementById('coaching-selected-summary');
+            const empty = document.getElementById('coaching-empty');
+            if (!selected.length) {
+                summary.textContent = '';
+                empty.classList.remove('hidden');
+            } else {
+                summary.textContent = `${selected.length} move${selected.length === 1 ? '' : 's'} tracked`;
+                empty.classList.add('hidden');
+            }
+        }
+
+        function toggleSubMove(obsId, subMoveId) {
+            if (!coachingData[obsId]) {
+                coachingData[obsId] = { ideas: generateCoachingIdeas(findObsById(obsId), 4), selectedSubMoves: [] };
+            }
+            const selected = coachingData[obsId].selectedSubMoves || [];
+            const index = selected.indexOf(subMoveId);
+            if (index >= 0) {
+                selected.splice(index, 1);
+            } else {
+                selected.push(subMoveId);
+            }
+            coachingData[obsId].selectedSubMoves = selected;
+            storage.setItem('bp_engine_coaching', JSON.stringify(coachingData));
+            renderCoachingPanel(getFilteredObs());
+        }
+
+        function findObsById(id) {
+            return obs.find(item => item.id === id) || obs[0];
+        }
+
+        function copyCoachNotes() {
+            const filtered = getFilteredObs();
+            if (!filtered.length) {
+                return;
+            }
+            const latest = [...filtered].sort((a, b) => (b.ts || 0) - (a.ts || 0))[0];
+            const stored = coachingData[latest.id];
+            const ideas = stored?.ideas || generateCoachingIdeas(latest, 4);
+            const selected = stored?.selectedSubMoves || [];
+            const selectedLabels = ideas.subMoves
+                .filter(move => selected.includes(move.id))
+                .map(move => move.label);
+
+            const content = [
+                `Focus: ${ideas.focusDimension}`,
+                `Selected Coaching Moves: ${selectedLabels.length ? selectedLabels.join(', ') : 'None'}`,
+                `Coaching Moves: ${ideas.moves.join('; ')}`,
+                `Micro-goal: ${ideas.microGoal}`,
+                `Look-fors: ${ideas.lookFors.join('; ')}`
+            ].join('\n');
+
+            if (navigator.clipboard?.writeText) {
+                navigator.clipboard.writeText(content);
+            }
+        }
+
+        function generateCoachingIdeas(entry, rubricLevelScale) {
+            const scores = [
+                { key: 's1', label: 'Visible Scholar Thinking', value: entry.s1 },
+                { key: 's2', label: 'Problem Solving Mastery', value: entry.s2 },
+                { key: 's3', label: 'Goal Agency', value: entry.s3 }
+            ];
+            const lowest = Math.min(...scores.map(score => score.value));
+            const priority = ['Problem Solving Mastery', 'Visible Scholar Thinking', 'Goal Agency'];
+            const focus = scores
+                .filter(score => score.value === lowest)
+                .sort((a, b) => priority.indexOf(a.label) - priority.indexOf(b.label))[0];
+
+            const level = focus.value;
+            const grade = entry.gradeLevel || 'this grade';
+            const focusArea = entry.contentFocus || 'this focus';
+
+            const playbook = {
+                'Visible Scholar Thinking': {
+                    subMoves: [
+                        { id: 'vst-annotate', label: 'Annotate reasoning', description: 'Students annotate steps, labels, and reasoning in notebooks.' },
+                        { id: 'vst-exit-ticket', label: 'Exit ticket explain', description: 'Exit tickets capture strategy explanation and reasoning.' },
+                        { id: 'vst-work-samples', label: 'Collect work samples', description: 'Teacher collects and reviews work samples for evidence.' },
+                        { id: 'vst-error-analysis', label: 'Error analysis routine', description: 'Students analyze errors and revise with evidence.' },
+                        { id: 'vst-representations', label: 'Use representations', description: 'Students explain thinking using models or diagrams.' }
+                    ],
+                    low: {
+                        why: 'Reasoning is not visible in artifacts, so it is hard to monitor progress.',
+                        moves: [
+                            `Launch ${focusArea} with a notebook routine: prompt students to restate the task and label their plan.`,
+                            'Collect two work samples per table and tag where reasoning is missing.',
+                            'Use a 60-second turn-and-explain to capture student language.'
+                        ],
+                        lookFors: [
+                            'Annotated steps in notebooks with labels or arrows.',
+                            'Exit tickets that include “why” or “how” statements.',
+                            'Talk moves recorded in a monitoring chart.'
+                        ],
+                        script: `“Show me your thinking for ${focusArea}. Write the plan before you solve, then explain it to a partner.”`,
+                        microGoal: `By the end of the lesson, 80% of students in grade ${grade} show annotated reasoning in their work.`
+                    },
+                    mid: {
+                        why: 'Reasoning appears in some artifacts but is inconsistent across students.',
+                        moves: [
+                            'Use a checklist for notebook evidence during monitoring.',
+                            'Ask students to add one representation to their solution.',
+                            'Collect exit tickets that require a justification sentence.'
+                        ],
+                        lookFors: [
+                            'Consistent annotations on most student work.',
+                            'Representations (models/graphs) labeled in notebooks.',
+                            'Monitoring notes that cite student explanations.'
+                        ],
+                        script: `“Add a representation for ${focusArea} and explain why it proves your answer.”`,
+                        microGoal: `During monitoring, collect evidence from 3 students per group that shows reasoning plus a representation.`
+                    },
+                    high: {
+                        why: 'Reasoning is visible; focus on transfer and refinement across tasks.',
+                        moves: [
+                            'Have students compare two strategies and annotate tradeoffs.',
+                            'Use peer feedback to revise reasoning statements.',
+                            'Capture exemplar work for future reference.'
+                        ],
+                        lookFors: [
+                            'Students reference multiple strategies in their notes.',
+                            'Revisions based on peer feedback are visible.',
+                            'Exemplar work is labeled and archived.'
+                        ],
+                        script: `“Compare two ways to solve ${focusArea}. Annotate which is more efficient and why.”`,
+                        microGoal: `Students independently justify strategy choices and revise their work with evidence.`
+                    }
+                },
+                'Problem Solving Mastery': {
+                    subMoves: [
+                        { id: 'psm-restate', label: 'Restate the question', description: 'Students restate the problem in their own words.' },
+                        { id: 'psm-strategy', label: 'Name the strategy', description: 'Students name a strategy before solving.' },
+                        { id: 'psm-justify', label: 'Justify strategy', description: 'Students justify why the strategy fits the task.' },
+                        { id: 'psm-check', label: 'Check and revise', description: 'Students check work and revise errors.' },
+                        { id: 'psm-reflect', label: 'Reflection prompt', description: 'Students reflect on what worked after solving.' }
+                    ],
+                    low: {
+                        why: 'Students are not consistently identifying the task or applying a clear strategy.',
+                        moves: [
+                            `Use a “What is the question?” routine before ${focusArea}.`,
+                            'Require students to name the strategy in writing before solving.',
+                            'Model a think-aloud with a check step at the end.'
+                        ],
+                        lookFors: [
+                            'Problem restated at the top of the page.',
+                            'Strategy name written before calculations.',
+                            'Visible check step (estimate or verification).'
+                        ],
+                        script: `“Before you solve ${focusArea}, write the question in your own words and name the strategy.”`,
+                        microGoal: `In grade ${grade}, 4/5 students write a strategy name before solving.`
+                    },
+                    mid: {
+                        why: 'Students can solve but strategy use and reflection are inconsistent.',
+                        moves: [
+                            'Add a strategy justification sentence to solutions.',
+                            'Use a checklist: restate, choose strategy, solve, check.',
+                            'Prompt a quick reflection: “What did you learn?”'
+                        ],
+                        lookFors: [
+                            'Strategy justification appears in student work.',
+                            'Checklist boxes are completed.',
+                            'Reflection responses are written or spoken.'
+                        ],
+                        script: `“Explain why your strategy fits ${focusArea}, then check and revise.”`,
+                        microGoal: `Students complete all four steps (restate, strategy, solve, check) on today’s task.`
+                    },
+                    high: {
+                        why: 'Students solve accurately; focus on adaptive strategy use.',
+                        moves: [
+                            'Have students choose between two strategies and defend the choice.',
+                            'Add a “revise after feedback” routine.',
+                            'Use reflection to connect to the next task.'
+                        ],
+                        lookFors: [
+                            'Multiple strategies documented and compared.',
+                            'Revisions after feedback are visible.',
+                            'Reflections connect to upcoming problems.'
+                        ],
+                        script: `“Solve ${focusArea} two ways and explain which strategy is more efficient.”`,
+                        microGoal: `Students independently select and adapt strategies across tasks.`
+                    }
+                },
+                'Goal Agency': {
+                    subMoves: [
+                        { id: 'ga-current', label: 'Know current data', description: 'Students state their current data point.' },
+                        { id: 'ga-goal', label: 'Goal is visible', description: 'Goals are written and visible to students.' },
+                        { id: 'ga-plan', label: 'Action plan stated', description: 'Students articulate steps to meet the goal.' },
+                        { id: 'ga-track', label: 'Track weekly progress', description: 'Progress monitoring updates are posted weekly.' },
+                        { id: 'ga-lead', label: 'Lead data talk', description: 'Students co-lead data conversations.' }
+                    ],
+                    low: {
+                        why: 'Students cannot connect their data to a clear goal or plan.',
+                        moves: [
+                            'Establish a data tracker and record current scores.',
+                            'Write a single measurable goal tied to ${focusArea}.',
+                            'Create a simple action plan with two steps.'
+                        ],
+                        lookFors: [
+                            'Data tracker with a current score.',
+                            'Goal statement visible in notebooks.',
+                            'Action steps written and referenced.'
+                        ],
+                        script: `“What is your current score and your next goal for ${focusArea}? Write the plan.”`,
+                        microGoal: `Every student records a current score and one action step by end of class.`
+                    },
+                    mid: {
+                        why: 'Goals are present, but plans are not consistently updated with progress checks.',
+                        moves: [
+                            'Schedule a weekly check-in and update the tracker.',
+                            'Have students explain how today’s work moves the goal.',
+                            'Use a quick data talk protocol with partners.'
+                        ],
+                        lookFors: [
+                            'Weekly updates in the data tracker.',
+                            'Students state how actions align to goals.',
+                            'Partner data talk notes collected.'
+                        ],
+                        script: `“Update your tracker and explain how today’s work moves your ${focusArea} goal.”`,
+                        microGoal: `Students update progress and articulate one adjustment based on data.`
+                    },
+                    high: {
+                        why: 'Students own goals; focus on adaptive planning and leadership.',
+                        moves: [
+                            'Students lead a data conversation with next steps.',
+                            'Use progress data to revise action plans.',
+                            'Share exemplars of goal-setting to peers.'
+                        ],
+                        lookFors: [
+                            'Students lead or co-lead data talks.',
+                            'Action plans revised after data checks.',
+                            'Peer coaching notes or exemplars collected.'
+                        ],
+                        script: `“Lead a data talk: show your ${focusArea} progress and how you will adjust next steps.”`,
+                        microGoal: `Students independently adjust plans based on progress monitoring.`
+                    }
+                }
+            };
+
+            const dimension = focus.label;
+            const bundle = playbook[dimension];
+            const tier = level <= 2 ? bundle.low : level === 3 ? bundle.mid : bundle.high;
+            return {
+                focusDimension: dimension,
+                whyThisFocus: tier.why,
+                moves: tier.moves,
+                lookFors: tier.lookFors,
+                coachScript: tier.script,
+                microGoal: tier.microGoal,
+                subMoves: bundle.subMoves
+            };
+        }
+
+        function updateC() {
+            const a1 = parseFloat(document.getElementById('avg-1').innerText);
+            const a2 = parseFloat(document.getElementById('avg-2').innerText);
+            const a3 = parseFloat(document.getElementById('avg-3').innerText);
+            const radarEmpty = document.getElementById('radar-empty');
+            const lineEmpty = document.getElementById('line-empty');
+            const hasCharts = typeof Chart !== 'undefined';
+
+            if (radarEmpty) {
+                radarEmpty.classList.toggle('hidden', obs.length > 0 && hasCharts);
+            }
+            if (lineEmpty) {
+                lineEmpty.classList.toggle('hidden', obs.length > 0 && hasCharts);
+            }
+            if (!hasCharts) {
+                return;
+            }
+            if(rChart) rChart.destroy(); if(lChart) lChart.destroy();
+
+            rChart = new Chart(document.getElementById('radarChart'), {
+                type: 'radar',
+                data: { 
+                    labels: ['Thinking', 'Solving', 'Agency'], 
+                    datasets: [{ data: [a1, a2, a3], backgroundColor: 'rgba(244, 114, 182, 0.05)', borderColor: '#f472b6', borderWidth: 3, pointBackgroundColor: '#0f172a' }] 
+                },
+                options: { scales: { r: { min: 0, max: 4, ticks: { display: false }, grid: { color: '#f1f5f9' } } }, plugins: { legend: { display: false } }, maintainAspectRatio: false }
+            });
+
+            const rObs = getFilteredObs().sort((a, b) => (a.ts || 0) - (b.ts || 0)).slice(-10);
+            lChart = new Chart(document.getElementById('lineChart'), {
+                type: 'line',
+                data: { 
+                    labels: rObs.map(r => r.dateLabel || r.date || ''), 
+                    datasets: [
+                        { label: 'Visible Scholar Thinking', data: rObs.map(r => r.s1), borderColor: '#0f172a', tension: 0.4, borderWidth: 3, pointRadius: 0 },
+                        { label: 'Problem Solving Mastery', data: rObs.map(r => r.s2), borderColor: '#10b981', tension: 0.4, borderWidth: 3, pointRadius: 0 },
+                        { label: 'Goal Agency', data: rObs.map(r => r.s3), borderColor: '#f472b6', tension: 0.4, borderWidth: 3, pointRadius: 0 }
+                    ]
+                },
+                options: { scales: { y: { min: 1, max: 4, grid: { color: '#f8fafc' } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } }, maintainAspectRatio: false }
+            });
+        }
+        window.onload = init;
+    </script>
+</body>
+</html>
