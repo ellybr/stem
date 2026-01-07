@@ -142,10 +142,21 @@
                             Copy Coach Notes
                         </button>
                     </div>
+                    <div class="bg-white rounded-2xl border border-slate-100 p-4">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Evidence I'm Responding To</p>
+                        <textarea id="coaching-evidence" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold text-slate-600 min-h-[90px]" placeholder="Add observable evidence..."></textarea>
+                    </div>
                     <div class="grid gap-4 md:grid-cols-2">
                         <div class="bg-white rounded-2xl border border-slate-100 p-4">
-                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Coaching Moves</p>
-                            <ul id="coaching-moves" class="space-y-2 text-xs text-slate-600 font-semibold"></ul>
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">Coaching Moves</p>
+                                <select id="coaching-status" class="p-2 bg-slate-50 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 border border-slate-200">
+                                    <option value="Planned">Planned</option>
+                                    <option value="Implemented">Implemented</option>
+                                    <option value="Observed Impact">Observed Impact</option>
+                                </select>
+                            </div>
+                            <div id="coaching-moves" class="space-y-3 text-xs text-slate-600 font-semibold"></div>
                         </div>
                         <div class="bg-white rounded-2xl border border-slate-100 p-4">
                             <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Look-fors</p>
@@ -156,10 +167,21 @@
                         <div class="bg-white rounded-2xl border border-slate-100 p-4">
                             <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Coach Script</p>
                             <p id="coaching-script" class="text-xs text-slate-600 font-semibold"></p>
+                            <ul id="coaching-script-variations" class="mt-3 space-y-2 text-xs text-slate-500 font-semibold"></ul>
                         </div>
                         <div class="bg-white rounded-2xl border border-slate-100 p-4">
                             <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Micro-goal</p>
                             <p id="coaching-microgoal" class="text-xs text-slate-600 font-semibold"></p>
+                        </div>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="bg-white rounded-2xl border border-slate-100 p-4">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Not Doing Right Now</p>
+                            <textarea id="coaching-not-doing" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold text-slate-600 min-h-[70px]" placeholder="Name a move you're intentionally not doing yet..."></textarea>
+                        </div>
+                        <div class="bg-white rounded-2xl border border-slate-100 p-4">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Coach Reflection</p>
+                            <textarea id="coaching-reflection" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold text-slate-600 min-h-[70px]" placeholder="Quick reflection tied to this visit..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -403,6 +425,7 @@
         let schools = JSON.parse(storage.getItem('bp_engine_schools')) || ['Central STEM Academy'];
         let obs = JSON.parse(storage.getItem('bp_engine_data')) || [];
         let coachingData = JSON.parse(storage.getItem('bp_engine_coaching')) || {};
+        let coachingTimeline = JSON.parse(storage.getItem('bp_engine_coaching_timeline')) || [];
         let rChart, lChart;
 
         function init() {
@@ -523,6 +546,23 @@
             const copyButton = document.getElementById('copy-coach-notes');
             if (copyButton) {
                 copyButton.addEventListener('click', copyCoachNotes);
+            }
+
+            const evidenceField = document.getElementById('coaching-evidence');
+            if (evidenceField) {
+                evidenceField.addEventListener('input', () => updateCoachingField('evidence'));
+            }
+            const statusField = document.getElementById('coaching-status');
+            if (statusField) {
+                statusField.addEventListener('change', () => updateCoachingField('status'));
+            }
+            const notDoingField = document.getElementById('coaching-not-doing');
+            if (notDoingField) {
+                notDoingField.addEventListener('input', () => updateCoachingField('notDoing'));
+            }
+            const reflectionField = document.getElementById('coaching-reflection');
+            if (reflectionField) {
+                reflectionField.addEventListener('input', () => updateCoachingField('reflection'));
             }
         }
 
@@ -710,10 +750,16 @@
             const ideas = generateCoachingIdeas(entry, 4);
             coachingData[entry.id] = {
                 ideas,
-                selectedSubMoves: []
+                selectedSubMoves: [],
+                evidence: buildEvidenceDefault(entry),
+                status: 'Planned',
+                notDoing: '',
+                reflection: '',
+                selectedMoves: {}
             };
             storage.setItem('bp_engine_data', JSON.stringify(obs));
             storage.setItem('bp_engine_coaching', JSON.stringify(coachingData));
+            updateCoachingTimeline(entry, coachingData[entry.id]);
             this.reset();
             const defaultValue = '3';
             ['s1', 's2', 's3'].forEach(id => {
@@ -731,6 +777,15 @@
             setDefaultDateTime();
             renderFilters();
             renderL(); updateC(); showTab('dash');
+        }
+
+        function buildEvidenceDefault(entry) {
+            const lines = [];
+            if (entry.notes) {
+                lines.push(`Notes: ${entry.notes}`);
+            }
+            lines.push(`Scores recorded — Thinking: ${entry.s1}, Solving: ${entry.s2}, Agency: ${entry.s3}.`);
+            return lines.join('\n');
         }
 
         function getFilteredObs() {
@@ -852,13 +907,48 @@
             document.getElementById('coaching-why').textContent = ideas.whyThisFocus;
             document.getElementById('coaching-script').textContent = ideas.coachScript;
             document.getElementById('coaching-microgoal').textContent = ideas.microGoal;
+            document.getElementById('coaching-evidence').value = stored?.evidence || buildEvidenceDefault(latest);
+            document.getElementById('coaching-status').value = stored?.status || 'Planned';
+            document.getElementById('coaching-not-doing').value = stored?.notDoing || '';
+            document.getElementById('coaching-reflection').value = stored?.reflection || '';
 
             const movesList = document.getElementById('coaching-moves');
             movesList.innerHTML = '';
+            const selectedMoves = stored?.selectedMoves || {};
             ideas.moves.forEach(move => {
-                const item = document.createElement('li');
-                item.textContent = move;
-                movesList.appendChild(item);
+                const wrapper = document.createElement('div');
+                wrapper.className = 'p-3 border border-slate-100 rounded-2xl bg-slate-50 space-y-2';
+
+                const header = document.createElement('label');
+                header.className = 'flex items-start gap-2 text-xs font-black text-slate-900';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = Boolean(selectedMoves[move.id]?.selected);
+                checkbox.addEventListener('change', () => {
+                    updateMoveSelection(move.id, { selected: checkbox.checked });
+                });
+                const title = document.createElement('span');
+                title.textContent = move.text;
+                header.appendChild(checkbox);
+                header.appendChild(title);
+
+                const purpose = document.createElement('p');
+                purpose.className = 'text-[11px] text-slate-600 font-semibold';
+                purpose.textContent = `Purpose: ${move.purpose}`;
+
+                const why = document.createElement('input');
+                why.type = 'text';
+                why.className = 'w-full p-2 bg-white border border-slate-200 rounded-xl text-[11px] font-semibold text-slate-600';
+                why.placeholder = 'Why I chose this...';
+                why.value = selectedMoves[move.id]?.why || '';
+                why.addEventListener('input', () => {
+                    updateMoveSelection(move.id, { why: why.value });
+                });
+
+                wrapper.appendChild(header);
+                wrapper.appendChild(purpose);
+                wrapper.appendChild(why);
+                movesList.appendChild(wrapper);
             });
 
             const lookForsList = document.getElementById('coaching-lookfors');
@@ -867,6 +957,14 @@
                 const item = document.createElement('li');
                 item.textContent = look;
                 lookForsList.appendChild(item);
+            });
+
+            const variationsList = document.getElementById('coaching-script-variations');
+            variationsList.innerHTML = '';
+            ideas.scriptVariations.forEach(variation => {
+                const item = document.createElement('li');
+                item.textContent = variation;
+                variationsList.appendChild(item);
             });
 
             const subMovesWrap = document.getElementById('coaching-submoves');
@@ -898,7 +996,15 @@
 
         function toggleSubMove(obsId, subMoveId) {
             if (!coachingData[obsId]) {
-                coachingData[obsId] = { ideas: generateCoachingIdeas(findObsById(obsId), 4), selectedSubMoves: [] };
+                coachingData[obsId] = {
+                    ideas: generateCoachingIdeas(findObsById(obsId), 4),
+                    selectedSubMoves: [],
+                    evidence: '',
+                    status: 'Planned',
+                    notDoing: '',
+                    reflection: '',
+                    selectedMoves: {}
+                };
             }
             const selected = coachingData[obsId].selectedSubMoves || [];
             const index = selected.indexOf(subMoveId);
@@ -909,7 +1015,77 @@
             }
             coachingData[obsId].selectedSubMoves = selected;
             storage.setItem('bp_engine_coaching', JSON.stringify(coachingData));
+            updateCoachingTimeline(findObsById(obsId), coachingData[obsId]);
             renderCoachingPanel(getFilteredObs());
+        }
+
+        function updateMoveSelection(moveId, updates) {
+            const latest = getLatestFilteredObservation();
+            if (!latest) {
+                return;
+            }
+            const entry = coachingData[latest.id];
+            if (!entry.selectedMoves) {
+                entry.selectedMoves = {};
+            }
+            entry.selectedMoves[moveId] = {
+                selected: entry.selectedMoves[moveId]?.selected || false,
+                why: entry.selectedMoves[moveId]?.why || '',
+                ...updates
+            };
+            storage.setItem('bp_engine_coaching', JSON.stringify(coachingData));
+            updateCoachingTimeline(latest, entry);
+        }
+
+        function updateCoachingField(field) {
+            const latest = getLatestFilteredObservation();
+            if (!latest) {
+                return;
+            }
+            const entry = coachingData[latest.id];
+            if (!entry) {
+                return;
+            }
+            if (field === 'evidence') {
+                entry.evidence = document.getElementById('coaching-evidence').value;
+            } else if (field === 'status') {
+                entry.status = document.getElementById('coaching-status').value;
+            } else if (field === 'notDoing') {
+                entry.notDoing = document.getElementById('coaching-not-doing').value;
+            } else if (field === 'reflection') {
+                entry.reflection = document.getElementById('coaching-reflection').value;
+            }
+            storage.setItem('bp_engine_coaching', JSON.stringify(coachingData));
+            updateCoachingTimeline(latest, entry);
+        }
+
+        function getLatestFilteredObservation() {
+            const filtered = getFilteredObs();
+            if (!filtered.length) {
+                return null;
+            }
+            return [...filtered].sort((a, b) => (b.ts || 0) - (a.ts || 0))[0];
+        }
+
+        function updateCoachingTimeline(obsEntry, coachingEntry) {
+            if (!obsEntry || !coachingEntry) {
+                return;
+            }
+            const ideas = coachingEntry.ideas || generateCoachingIdeas(obsEntry, 4);
+            const selectedMoves = coachingEntry.selectedMoves || {};
+            const selectedIds = Object.keys(selectedMoves).filter(key => selectedMoves[key]?.selected);
+            const timelineEntry = {
+                id: obsEntry.id,
+                teacher: obsEntry.teacher || obsEntry.t || 'NA',
+                focus: ideas.focusDimension,
+                dateLabel: obsEntry.dateLabel || obsEntry.date || 'NA',
+                status: coachingEntry.status || 'Planned',
+                selectedMoves: selectedIds
+            };
+            coachingTimeline = coachingTimeline.filter(item => item.id !== obsEntry.id);
+            coachingTimeline.unshift(timelineEntry);
+            coachingTimeline = coachingTimeline.slice(0, 20);
+            storage.setItem('bp_engine_coaching_timeline', JSON.stringify(coachingTimeline));
         }
 
         function findObsById(id) {
@@ -925,13 +1101,17 @@
             const stored = coachingData[latest.id];
             const ideas = stored?.ideas || generateCoachingIdeas(latest, 4);
             const selected = stored?.selectedSubMoves || [];
+            const moveSelections = stored?.selectedMoves || {};
+            const selectedMoveLabels = ideas.moves
+                .filter(move => moveSelections[move.id]?.selected)
+                .map(move => move.text);
             const selectedLabels = ideas.subMoves
                 .filter(move => selected.includes(move.id))
                 .map(move => move.label);
 
             const content = [
                 `Focus: ${ideas.focusDimension}`,
-                `Selected Coaching Moves: ${selectedLabels.length ? selectedLabels.join(', ') : 'None'}`,
+                `Selected Coaching Moves: ${selectedMoveLabels.length ? selectedMoveLabels.join(', ') : 'None'}`,
                 `Coaching Moves: ${ideas.moves.join('; ')}`,
                 `Micro-goal: ${ideas.microGoal}`,
                 `Look-fors: ${ideas.lookFors.join('; ')}`
@@ -970,9 +1150,9 @@
                     low: {
                         why: 'Reasoning is not captured in artifacts, so progress monitoring lacks evidence.',
                         moves: [
-                            `Co-construct success criteria for ${focusArea} and model an annotated example.`,
-                            'Capture at least two work samples per group, including one developing example.',
-                            'Use multilingual or visual talk moves so every student can explain thinking.'
+                            { id: 'vst-criteria', text: `Co-construct success criteria for ${focusArea}.`, purpose: 'Make expectations visible before students work.' },
+                            { id: 'vst-sampling', text: 'Capture two work samples per group.', purpose: 'Ensure evidence represents multiple learners.' },
+                            { id: 'vst-multimodal', text: 'Use multimodal talk moves (oral, visual, gesture).', purpose: 'Expand access for varied language needs.' }
                         ],
                         lookFors: [
                             'Annotated steps in notebooks with labels or arrows.',
@@ -980,14 +1160,18 @@
                             'Monitoring notes reflect multiple student voices.'
                         ],
                         script: `“Let’s name the success criteria for ${focusArea}. Show your plan and explain it with words, diagrams, or gestures.”`,
+                        scriptVariations: [
+                            '“Use the strategy card to name your plan before you solve.”',
+                            '“Sketch or gesture your thinking if words are hard right now.”'
+                        ],
                         microGoal: `By the end of class, evidence from each group includes at least one annotated reasoning sample.`
                     },
                     mid: {
                         why: 'Reasoning appears in some artifacts but is inconsistent across students.',
                         moves: [
-                            'Use a monitoring checklist that tracks who has evidence captured.',
-                            'Ask students to add one representation and a justification sentence.',
-                            'Collect exit tickets with a sentence frame for explanation.'
+                            { id: 'vst-checklist', text: 'Use a monitoring checklist for evidence collection.', purpose: 'Track who has visible reasoning captured.' },
+                            { id: 'vst-representation', text: 'Require a representation plus justification.', purpose: 'Connect reasoning to a model or diagram.' },
+                            { id: 'vst-sentence-frame', text: 'Use a sentence frame on exit tickets.', purpose: 'Standardize explanation quality.' }
                         ],
                         lookFors: [
                             'Consistent annotations on most student work.',
@@ -995,14 +1179,18 @@
                             'Monitoring notes that cite multiple students.'
                         ],
                         script: `“Add a representation for ${focusArea} and use the sentence frame to justify your answer.”`,
+                        scriptVariations: [
+                            '“Circle the step where your strategy changed and explain why.”',
+                            '“Write one sentence that connects your model to the answer.”'
+                        ],
                         microGoal: `Collect reasoning evidence from every group, including at least two different students per group.`
                     },
                     high: {
                         why: 'Reasoning is visible; focus on transfer and refinement across tasks.',
                         moves: [
-                            'Have students compare two strategies and annotate tradeoffs.',
-                            'Use peer feedback protocols so every student revises at least one explanation.',
-                            'Capture diverse exemplars that show different approaches.'
+                            { id: 'vst-compare', text: 'Compare two strategies and annotate tradeoffs.', purpose: 'Deepen reasoning about efficiency.' },
+                            { id: 'vst-peer-feedback', text: 'Use peer feedback to revise explanations.', purpose: 'Strengthen justification quality.' },
+                            { id: 'vst-exemplars', text: 'Capture diverse exemplars.', purpose: 'Show multiple valid approaches.' }
                         ],
                         lookFors: [
                             'Students reference multiple strategies in their notes.',
@@ -1010,6 +1198,10 @@
                             'Exemplars include varied approaches.'
                         ],
                         script: `“Compare two ways to solve ${focusArea}. Annotate which is more efficient and why.”`,
+                        scriptVariations: [
+                            '“Name the strategy you rejected and why.”',
+                            '“Highlight the step that makes your method more efficient.”'
+                        ],
                         microGoal: `Students independently justify strategy choices and revise their work with evidence.`
                     }
                 },
@@ -1024,9 +1216,9 @@
                     low: {
                         why: 'Students are not consistently identifying the task or applying a clear strategy.',
                         moves: [
-                            `Use a “What is the question?” routine before ${focusArea} with visual supports.`,
-                            'Require students to name the strategy in writing or orally before solving.',
-                            'Model a think-aloud that includes a check step and error correction.'
+                            { id: 'psm-question', text: 'Use a “What is the question?” routine with visuals.', purpose: 'Clarify task identification.' },
+                            { id: 'psm-strategy-name', text: 'Require students to name the strategy before solving.', purpose: 'Make strategy selection explicit.' },
+                            { id: 'psm-think-aloud', text: 'Model a think-aloud with a check step.', purpose: 'Normalize verification and revision.' }
                         ],
                         lookFors: [
                             'Problem restated at the top of the page.',
@@ -1034,14 +1226,18 @@
                             'Check step recorded (estimate, inverse, or verification).'
                         ],
                         script: `“Before you solve ${focusArea}, write the question in your own words and name the strategy.”`,
+                        scriptVariations: [
+                            '“Point to the question and say it in your own words.”',
+                            '“Name the strategy you will use before you write numbers.”'
+                        ],
                         microGoal: `In grade ${grade}, 4/5 students write a strategy name before solving.`
                     },
                     mid: {
                         why: 'Students can solve but strategy use and reflection are inconsistent.',
                         moves: [
-                            'Add a strategy justification sentence to solutions.',
-                            'Use a checklist: restate, choose strategy, solve, check.',
-                            'Prompt a quick reflection: “What did you learn and what will you try next?”'
+                            { id: 'psm-justify', text: 'Add a strategy justification sentence.', purpose: 'Link strategy to task demands.' },
+                            { id: 'psm-checklist', text: 'Use a 4-step checklist (restate, strategy, solve, check).', purpose: 'Build reliable routines.' },
+                            { id: 'psm-reflection', text: 'Prompt a quick reflection after solving.', purpose: 'Normalize learning from errors.' }
                         ],
                         lookFors: [
                             'Strategy justification appears in student work.',
@@ -1049,14 +1245,18 @@
                             'Reflection responses are written, spoken, or recorded.'
                         ],
                         script: `“Explain why your strategy fits ${focusArea}, then check and revise.”`,
+                        scriptVariations: [
+                            '“Name the strategy and one reason it fits the question.”',
+                            '“Finish with a check: estimate or inverse.”'
+                        ],
                         microGoal: `Students complete all four steps (restate, strategy, solve, check) on today’s task.`
                     },
                     high: {
                         why: 'Students solve accurately; focus on adaptive strategy use.',
                         moves: [
-                            'Have students choose between two strategies and defend the choice.',
-                            'Add a “revise after feedback” routine.',
-                            'Use reflection to connect to the next task.'
+                            { id: 'psm-compare', text: 'Have students compare two strategies.', purpose: 'Strengthen adaptive strategy choice.' },
+                            { id: 'psm-revise', text: 'Add a revise-after-feedback routine.', purpose: 'Build iterative problem solving.' },
+                            { id: 'psm-transfer', text: 'Use reflection to connect to the next task.', purpose: 'Support transfer across tasks.' }
                         ],
                         lookFors: [
                             'Multiple strategies documented and compared.',
@@ -1064,6 +1264,10 @@
                             'Reflections connect to upcoming problems.'
                         ],
                         script: `“Solve ${focusArea} two ways and explain which strategy is more efficient.”`,
+                        scriptVariations: [
+                            '“Which strategy saved the most steps? Prove it.”',
+                            '“What would you do differently next time?”'
+                        ],
                         microGoal: `Students independently select and adapt strategies across tasks.`
                     }
                 },
@@ -1078,9 +1282,9 @@
                     low: {
                         why: 'Students cannot connect their data to a clear goal or plan.',
                         moves: [
-                            'Establish a data tracker and record current scores.',
-                            `Write a single measurable goal tied to ${focusArea} with student language.`,
-                            'Create a simple action plan with two steps and one check-in date.'
+                            { id: 'ga-tracker', text: 'Establish a data tracker and record current scores.', purpose: 'Make current performance visible.' },
+                            { id: 'ga-goal', text: `Write a measurable goal tied to ${focusArea}.`, purpose: 'Clarify the target outcome.' },
+                            { id: 'ga-plan', text: 'Create a 2-step action plan with a check-in date.', purpose: 'Link actions to the goal.' }
                         ],
                         lookFors: [
                             'Data tracker with a current score.',
@@ -1088,14 +1292,18 @@
                             'Action steps written with a check-in date.'
                         ],
                         script: `“What is your current score and your next goal for ${focusArea}? Write the plan.”`,
+                        scriptVariations: [
+                            '“Show me where your current data lives and write your next step.”',
+                            '“What will you try before the next check-in?”'
+                        ],
                         microGoal: `Every student records a current score and one action step by end of class.`
                     },
                     mid: {
                         why: 'Goals are present, but plans are not consistently updated with progress checks.',
                         moves: [
-                            'Schedule a weekly check-in and update the tracker.',
-                            'Have students explain how today’s work moves the goal.',
-                            'Use a quick data talk protocol with partners.'
+                            { id: 'ga-checkin', text: 'Schedule a weekly check-in and update the tracker.', purpose: 'Create a consistent monitoring cadence.' },
+                            { id: 'ga-explain', text: 'Have students explain how today’s work moves the goal.', purpose: 'Connect daily work to goals.' },
+                            { id: 'ga-data-talk', text: 'Use a partner data talk protocol.', purpose: 'Build student ownership through dialogue.' }
                         ],
                         lookFors: [
                             'Weekly updates in the data tracker.',
@@ -1103,14 +1311,18 @@
                             'Partner data talk notes collected.'
                         ],
                         script: `“Update your tracker and explain how today’s work moves your ${focusArea} goal.”`,
+                        scriptVariations: [
+                            '“What changed in your data since last week?”',
+                            '“Name one action you will keep and one you will adjust.”'
+                        ],
                         microGoal: `Students update progress and articulate one adjustment based on data.`
                     },
                     high: {
                         why: 'Students own goals; focus on adaptive planning and leadership.',
                         moves: [
-                            'Students lead a data conversation with next steps.',
-                            'Use progress data to revise action plans.',
-                            'Share exemplars of goal-setting to peers.'
+                            { id: 'ga-lead', text: 'Students lead a data conversation with next steps.', purpose: 'Build leadership in goal setting.' },
+                            { id: 'ga-revise', text: 'Use progress data to revise action plans.', purpose: 'Adapt strategies based on evidence.' },
+                            { id: 'ga-exemplars', text: 'Share exemplars of goal-setting to peers.', purpose: 'Spread effective routines.' }
                         ],
                         lookFors: [
                             'Students lead or co-lead data talks.',
@@ -1118,6 +1330,10 @@
                             'Peer coaching notes or exemplars collected.'
                         ],
                         script: `“Lead a data talk: show your ${focusArea} progress and how you will adjust next steps.”`,
+                        scriptVariations: [
+                            '“Which action had the biggest impact on your data?”',
+                            '“What is your next experiment to reach the goal?”'
+                        ],
                         microGoal: `Students independently adjust plans based on progress monitoring.`
                     }
                 }
@@ -1132,6 +1348,7 @@
                 moves: tier.moves,
                 lookFors: tier.lookFors,
                 coachScript: tier.script,
+                scriptVariations: tier.scriptVariations,
                 microGoal: tier.microGoal,
                 subMoves: bundle.subMoves
             };
