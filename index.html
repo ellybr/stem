@@ -1179,6 +1179,182 @@
             coachingData[selected.id] = note;
             storage.setItem('bp_engine_coaching', JSON.stringify(coachingData));
             updateCoachingTimeline(selected, note);
+            if (!filtered.length) {
+                panel.classList.add('hidden');
+                return;
+            }
+            const latest = getSelectedObservation(filtered);
+            if (!latest) {
+                panel.classList.add('hidden');
+                return;
+            }
+
+            const stored = coachingData[latest.id];
+            const ideas = stored?.ideas || generateCoachingIdeas(latest, 4);
+            const selected = stored?.selectedSubMoves || [];
+
+            panel.classList.remove('hidden');
+            document.getElementById('coaching-focus').textContent = ideas.focusDimension;
+            document.getElementById('coaching-why').textContent = ideas.whyThisFocus;
+            document.getElementById('coaching-script').textContent = ideas.coachScript;
+            document.getElementById('coaching-microgoal').textContent = ideas.microGoal;
+            document.getElementById('coaching-evidence').value = stored?.evidence || buildEvidenceDefault(latest);
+            document.getElementById('coaching-status').value = stored?.status || 'Planned';
+            document.getElementById('coaching-not-doing').value = stored?.notDoing || '';
+            document.getElementById('coaching-reflection').value = stored?.reflection || '';
+            document.getElementById('coaching-lookfors-notes').value = stored?.lookForsNotes || ideas.lookFors.join('\n');
+            document.getElementById('coaching-teacher-feedback').value = stored?.teacherFeedback || '';
+            document.getElementById('coaching-goals').value = stored?.goals || '';
+            document.getElementById('coaching-interaction').value = stored?.interaction || '';
+            document.getElementById('coaching-student-growth').value = stored?.studentGrowth || '';
+
+            const movesList = document.getElementById('coaching-moves');
+            movesList.innerHTML = '';
+            const selectedMoves = stored?.selectedMoves || {};
+            ideas.moves.forEach(move => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'p-3 border border-slate-100 rounded-2xl bg-slate-50 space-y-2';
+
+                const header = document.createElement('label');
+                header.className = 'flex items-start gap-2 text-xs font-black text-slate-900';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = Boolean(selectedMoves[move.id]?.selected);
+                checkbox.addEventListener('change', () => {
+                    updateMoveSelection(move.id, { selected: checkbox.checked });
+                });
+                const title = document.createElement('span');
+                title.textContent = move.text;
+                header.appendChild(checkbox);
+                header.appendChild(title);
+
+                const purpose = document.createElement('p');
+                purpose.className = 'text-[11px] text-slate-600 font-semibold';
+                purpose.textContent = `Purpose: ${move.purpose}`;
+
+                const why = document.createElement('input');
+                why.type = 'text';
+                why.className = 'w-full p-2 bg-white border border-slate-200 rounded-xl text-[11px] font-semibold text-slate-600';
+                why.placeholder = 'Why I chose this...';
+                why.value = selectedMoves[move.id]?.why || '';
+                why.addEventListener('input', () => {
+                    updateMoveSelection(move.id, { why: why.value });
+                });
+
+                wrapper.appendChild(header);
+                wrapper.appendChild(purpose);
+                wrapper.appendChild(why);
+                movesList.appendChild(wrapper);
+            });
+
+            const variationsList = document.getElementById('coaching-script-variations');
+            variationsList.innerHTML = '';
+            ideas.scriptVariations.forEach(variation => {
+                const item = document.createElement('li');
+                item.textContent = variation;
+                variationsList.appendChild(item);
+            });
+
+            const subMovesWrap = document.getElementById('coaching-submoves');
+            subMovesWrap.innerHTML = '';
+            ideas.subMoves.forEach(subMove => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'px-3 py-2 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-colors';
+                const isActive = selected.includes(subMove.id);
+                button.classList.add(isActive ? 'bg-brand-pink text-white border-brand-pink' : 'bg-slate-50 text-slate-600 border-slate-200');
+                button.textContent = subMove.label;
+                button.title = subMove.description;
+                button.addEventListener('click', () => {
+                    toggleSubMove(latest.id, subMove.id);
+                });
+                subMovesWrap.appendChild(button);
+            });
+
+            const summary = document.getElementById('coaching-selected-summary');
+            const empty = document.getElementById('coaching-empty');
+            if (!selected.length) {
+                summary.textContent = '';
+                empty.classList.remove('hidden');
+            } else {
+                summary.textContent = `${selected.length} move${selected.length === 1 ? '' : 's'} tracked`;
+                empty.classList.add('hidden');
+            }
+        }
+
+        function toggleSubMove(obsId, subMoveId) {
+            if (!coachingData[obsId]) {
+                coachingData[obsId] = {
+                    ideas: generateCoachingIdeas(findObsById(obsId), 4),
+                    selectedSubMoves: [],
+                    evidence: '',
+                    status: 'Planned',
+                    notDoing: '',
+                    reflection: '',
+                    selectedMoves: {}
+                };
+            }
+            const selected = coachingData[obsId].selectedSubMoves || [];
+            const index = selected.indexOf(subMoveId);
+            if (index >= 0) {
+                selected.splice(index, 1);
+            } else {
+                selected.push(subMoveId);
+            }
+            coachingData[obsId].selectedSubMoves = selected;
+            storage.setItem('bp_engine_coaching', JSON.stringify(coachingData));
+            updateCoachingTimeline(findObsById(obsId), coachingData[obsId]);
+            renderCoachingPanel(getFilteredObs());
+        }
+
+        function updateMoveSelection(moveId, updates) {
+            const latest = getLatestFilteredObservation();
+            if (!latest) {
+                return;
+            }
+            const entry = coachingData[latest.id];
+            if (!entry.selectedMoves) {
+                entry.selectedMoves = {};
+            }
+            entry.selectedMoves[moveId] = {
+                selected: entry.selectedMoves[moveId]?.selected || false,
+                why: entry.selectedMoves[moveId]?.why || '',
+                ...updates
+            };
+            storage.setItem('bp_engine_coaching', JSON.stringify(coachingData));
+            updateCoachingTimeline(latest, entry);
+        }
+
+        function updateCoachingField(field) {
+            const latest = getLatestFilteredObservation();
+            if (!latest) {
+                return;
+            }
+            const entry = coachingData[latest.id];
+            if (!entry) {
+                return;
+            }
+            if (field === 'evidence') {
+                entry.evidence = document.getElementById('coaching-evidence').value;
+            } else if (field === 'status') {
+                entry.status = document.getElementById('coaching-status').value;
+            } else if (field === 'lookFors') {
+                entry.lookForsNotes = document.getElementById('coaching-lookfors-notes').value;
+            } else if (field === 'notDoing') {
+                entry.notDoing = document.getElementById('coaching-not-doing').value;
+            } else if (field === 'reflection') {
+                entry.reflection = document.getElementById('coaching-reflection').value;
+            } else if (field === 'teacherFeedback') {
+                entry.teacherFeedback = document.getElementById('coaching-teacher-feedback').value;
+            } else if (field === 'goals') {
+                entry.goals = document.getElementById('coaching-goals').value;
+            } else if (field === 'interaction') {
+                entry.interaction = document.getElementById('coaching-interaction').value;
+            } else if (field === 'studentGrowth') {
+                entry.studentGrowth = document.getElementById('coaching-student-growth').value;
+            }
+            storage.setItem('bp_engine_coaching', JSON.stringify(coachingData));
+            updateCoachingTimeline(latest, entry);
         }
 
         function getLatestFilteredObservation() {
